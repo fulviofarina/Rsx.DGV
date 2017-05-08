@@ -7,9 +7,37 @@ using System.Windows.Forms;
 
 namespace Rsx.DGV
 {
-  public partial class Control
-  {
-    public Control(Refresher refresher, Informer informMethod, ref Rsx.DGV.IFind searcher)
+  public partial class Control : IDGVControlMethods, IDGVControlCreate, IDGVControlInvoke, IDGVControl
+    {
+
+        public IDGVControlMethods IMethods
+        {
+
+            get
+            {
+                return this;
+            }
+        }
+
+        public IDGVControlInvoke IInvoke
+        {
+
+            get
+            {
+                return this;
+            }
+        }
+
+        public IDGVControlCreate ICreate
+        {
+
+            get
+            {
+                return this;
+            }
+        }
+
+        public Control(Refresher refresher, Informer informMethod, ref Rsx.DGV.IFind searcher)
     {
       _informMethod = informMethod;
 
@@ -93,15 +121,17 @@ namespace Rsx.DGV
 
     public void SetContext(string controlHeader, ref DataGridView[] dgvs, ContextMenuStrip cms)
     {
-      foreach (DataGridView dgv in dgvs)
-      {
-        dgv.Name = controlHeader; //control header where it is coming from
-        dgv.ContextMenuStrip = cms;
-        dgv.Tag = this;  //set the cv as tag of the DGV
-      }
+            dGVs = dgvs;
+            if (dGVs == null) return ;
+            foreach (DataGridView dgv in dgvs)
+            {
+                dgv.Name = controlHeader; //control header where it is coming from
+                dgv.ContextMenuStrip = cms;
+                dgv.Tag = this;  //set the cv as tag of the DGV
+            }
     }
 
-    public void CreateEvents(ref ToolStripButton[] items)
+    public void CreateButtonEvents(ref ToolStripButton[] items)
     {
       ToolStripButton[] items2 = items.Where(i => i.Text.Contains("Save Data")).ToArray();
       foreach (ToolStripButton i in items2) SetSaver(i);
@@ -113,58 +143,61 @@ namespace Rsx.DGV
       items2 = null;
     }
 
-    public bool CreateEvents(ref DataGridView[] dgvs)
+        
+    public bool CreateDGVEvents()
     {
-      dGVs = dgvs;
 
-      if (dGVs == null) return false;
-      int count = dGVs.Count();
-      if (count == 0) return false;
+     
 
-      //  indexes = new HashSet<int>[count];
+            if (dGVs == null) return false;
+            int count = dGVs.Count();
+            if (count == 0) return false;
 
-      // ContextMenuStrip cms = null;
+            //  indexes = new HashSet<int>[count];
 
-      //for (int j = 0; j < 1; j++)
-      for (int j = 0; j < count; j++)
-      {
-        DataGridView dgv = dGVs[j];
+            // ContextMenuStrip cms = null;
 
-        dgv.KeyUp -= this.KeyUp;
-        dgv.Sorted -= (dgv_Sorted);
+            //for (int j = 0; j < 1; j++)
+            for (int j = 0; j < count; j++)
+            {
+                DataGridView dgv = dGVs[j];
 
-        dgv.KeyUp += this.KeyUp;
-        dgv.Sorted += (dgv_Sorted);
+                dgv.KeyUp -= this.KeyUp;
+                dgv.Sorted -= (dgv_Sorted);
 
-        if (_postpaintRows != null && _shouldPostPaintRow != null)
-        {
-          dgv.RowPostPaint -= dgv_RowPostPaint;
-          dgv.RowPostPaint += dgv_RowPostPaint;
-        }
-        if (_prepaintRows != null && _shouldPrePaintRow != null)
-        {
-          dgv.RowPrePaint -= dgv_RowPrePaint;
-          dgv.RowPrePaint += dgv_RowPrePaint;
-        }
-        if (_paintCells != null && _shouldPaintCell != null)
-        {
-          dgv.CellPainting -= this.dgv_CellPainting;
-          dgv.CellPainting += this.dgv_CellPainting;
-        }
+                dgv.KeyUp += this.KeyUp;
+                dgv.Sorted += (dgv_Sorted);
 
-        dgv.RowValidated -= dgv_RowValidated;
-        dgv.RowValidated += dgv_RowValidated;
+                if (_postpaintRows != null && _shouldPostPaintRow != null)
+                {
+                    dgv.RowPostPaint -= dgv_RowPostPaint;
+                    dgv.RowPostPaint += dgv_RowPostPaint;
+                }
+                if (_prepaintRows != null && _shouldPrePaintRow != null)
+                {
+                    dgv.RowPrePaint -= dgv_RowPrePaint;
+                    dgv.RowPrePaint += dgv_RowPrePaint;
+                }
+                if (_paintCells != null && _shouldPaintCell != null)
+                {
+                    dgv.CellPainting -= this.dgv_CellPainting;
+                    dgv.CellPainting += this.dgv_CellPainting;
+                }
 
-        dgv.MouseHover -= dgv_MouseHover;
-        dgv.MouseHover += dgv_MouseHover;
+                dgv.RowValidated -= dgv_RowValidated;
+                dgv.RowValidated += dgv_RowValidated;
 
-        dgv.CellEndEdit -= dgv_RowValidated;
-        dgv.CellEndEdit += dgv_RowValidated;
+                dgv.MouseHover -= dgv_MouseHover;
+                dgv.MouseHover += dgv_MouseHover;
 
-        BoldHeaders(ref dgv);
-      }
+                dgv.CellEndEdit -= dgv_RowValidated;
+                dgv.CellEndEdit += dgv_RowValidated;
 
-      return true;
+                BoldHeaders(ref dgv);
+            }
+
+
+            return true;
     }
 
     public static void BoldHeaders(ref DataGridView dgv)
@@ -221,11 +254,17 @@ namespace Rsx.DGV
         case Keys.A:
           {
             action = "Added";
-            result = Add(ref dgv);
+            result = Add(ref dgv, true);
             doRest = true;
           }
           break;
-
+   case Keys.D:
+          {
+            action = "Deleted";
+            result = Add(ref dgv, false);
+            doRest = true;
+          }
+          break;
         case Keys.T:
           {
             action = "Cloned";
@@ -369,6 +408,6 @@ namespace Rsx.DGV
       hs = null;
     }
 
-    public delegate void Informer(string Result, string Action);
+    public delegate void Informer(string Result, string Action, bool ok=true);
   }
 }

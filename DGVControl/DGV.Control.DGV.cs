@@ -4,7 +4,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-
+using Rsx.Dumb;
 namespace Rsx.DGV
 {
   public partial class Control
@@ -62,7 +62,7 @@ namespace Rsx.DGV
     {
       if (haschanges)
       {
-        DataRow dtr = Dumb.Cast<DataRow>(r);
+        DataRow dtr = Caster.Cast<DataRow>(r);
 
         if (dtr.RowState == DataRowState.Added)
         {
@@ -139,7 +139,7 @@ namespace Rsx.DGV
 
       DataTable dt = GetDataSource<DataTable>(ref dgv);
       if (dt == null) return;
-      bool haschanges = Dumb.HasChanges(dt.AsEnumerable());
+      bool haschanges = Dumb.Changes.HasChanges(dt.AsEnumerable());
       SetSaveButtonState(haschanges);
     }
 
@@ -175,19 +175,20 @@ namespace Rsx.DGV
         DataGridView dgv = sender as DataGridView;
 
         DataGridViewRow dgvr = dgv.Rows[ind];
-        DataRow r = Dumb.Cast<DataRow>(dgvr);
+        DataRow r = Caster.Cast<DataRow>(dgvr);
         if (r == null) return;
 
         UserControl con = this.usrControl as UserControl;
         con.Validate();
 
-        bool haschanges = Dumb.HasChanges(r);
+        bool haschanges = Dumb.Changes.HasChanges(r);
         PaintChanges(ref dgvr, haschanges);
 
         if (haschanges) SetSaveButtonState(haschanges); //only if this has changes! otherwise it overrides a previous row that does have canges
       }
       catch (SystemException ex)
       {
+
       }
     }
 

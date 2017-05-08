@@ -2,7 +2,7 @@
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-
+using Rsx.Dumb;
 namespace Rsx.DGV
 {
   public partial class Control
@@ -61,7 +61,7 @@ namespace Rsx.DGV
       return "OK! Selected were copied";
     }
 
-    public string Add(ref DataGridView dgv)
+    public string Add(ref DataGridView dgv, bool add = true)
     {
       if (dgv == null) return "The Data Grid cannot be null";
 
@@ -70,13 +70,26 @@ namespace Rsx.DGV
       DataColumn col = table.PrimaryKey.FirstOrDefault();
       if (col != null) indexfield = col.ColumnName;
 
-      DataRow s = table.NewRow();
-      table.Rows.Add(s);
-
-      if (_rowAddedMethod != null)
-      {
-        _rowAddedMethod.Invoke(ref s);
-      }
+      string aux = "added";
+            if (add)
+            {
+                DataRow s = table.NewRow();
+                table.Rows.Add(s);
+              
+                    _rowAddedMethod?.Invoke(ref s);
+               
+            }
+            else
+            {
+                aux = "deleted";
+                if (dgv.CurrentRow != null)
+                {
+                    DataRow s = (dgv.CurrentRow.DataBoundItem as DataRowView).Row;
+                    s.Delete();
+                    //  DataRow s = null;
+                    _rowDeletedMethod?.Invoke(ref s);
+                }
+            }
       /*
         Func<DataRowView, bool> finder = f =>
         {
@@ -85,15 +98,15 @@ namespace Rsx.DGV
         };
        */
 
-      if (!indexfield.Equals(string.Empty))
-      {
-        BindingSource BS = GetDataSource<BindingSource>(ref dgv);
-        BS.Sort = indexfield + " desc";
+    //  if (!indexfield.Equals(string.Empty))
+      //{
+      //  BindingSource BS = GetDataSource<BindingSource>(ref dgv);
+      //  BS.Sort = indexfield + " desc";
 
-        BS.RemoveFilter();
-      }
+       // BS.RemoveFilter(); ///?????
+      //}
 
-      return "OK! A new Row was added";
+      return "OK! A new Item was " + aux;
     }
 
     public static string Paste(ref DataGridView dgv)
@@ -126,7 +139,7 @@ namespace Rsx.DGV
 
       DataTable dt = GetDataSource<DataTable>(ref dgv);
 
-      Dumb.CloneRows(ref dgv, ref dt);
+      Tables.CloneRows(ref dgv, ref dt);
 
       return "OK! Selected cells were cloned";
     }

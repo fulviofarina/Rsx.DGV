@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using Rsx.Dumb;
 
 namespace Rsx.DGV
 {
@@ -60,7 +61,7 @@ namespace Rsx.DGV
             averaged = new DataTable();
             string fielditerator = filterFields.Last();
             int indexOflast = (filterFields.Length - 1);
-            ICollection<string> fielditeratorValues = Dumb.HashFrom<string>(toFilterAndAvg.Columns[fielditerator]);
+            ICollection<string> fielditeratorValues = Dumb.Hash.HashFrom<string>(toFilterAndAvg.Columns[fielditerator]);
             DataTable AvgOneIteration = null;
             foreach (string r in fielditeratorValues)
             {
@@ -544,13 +545,13 @@ namespace Rsx.DGV
           num++;
         }
         dgv.Columns.Add(Y.ColumnName, Y.ColumnName);
-        List<string> list = new List<string>(Dumb.HashFrom<string>(X));
+        List<string> list = new List<string>(Hash.HashFrom<string>(X));
         list.Sort(stringsorter);
         foreach (string xi in list)
         {
           dgv.Columns.Add(xi, xi);
         }
-        List<string> list2 = new List<string>(Dumb.HashFrom<string>(Y));
+        List<string> list2 = new List<string>(Hash.HashFrom<string>(Y));
         int w = 0;
         ArrayList rowcol = new ArrayList();
 
@@ -639,9 +640,9 @@ namespace Rsx.DGV
 
         IEnumerable<DataRowView> enumerable = view.Cast<DataRowView>().ToList();
 
-        IList<object> list = Dumb.HashFrom<object>(enumerable, fieldX);
+        IList<object> list = Dumb.Hash.HashFrom<object>(enumerable, fieldX);
         foreach (object xi in list) dgv.Columns.Add(xi.ToString(), xi.ToString());
-        IList<object> list2 = Dumb.HashFrom<object>(enumerable, fieldY);
+        IList<object> list2 = Dumb.Hash.HashFrom<object>(enumerable, fieldY);
 
         int w = 0;
         foreach (object yi in list2)
@@ -936,7 +937,7 @@ namespace Rsx.DGV
           if (parent.IsNull(ParentColumnNameWithTipData)) continue;
           double time = Convert.ToDouble(parent[ParentColumnNameWithTipData]);
           TimeSpan span = TimeSpan.FromSeconds(time);
-          string str = Dumb.ToReadableString(span);
+          string str = Dumb.Dumb.ToReadableString(span);
           DataGridViewColumnHeaderCell headerCell = cell.OwningColumn.HeaderCell;
           headerCell.ToolTipText = headerCell.ToolTipText + Comment + str + "\n";
         }

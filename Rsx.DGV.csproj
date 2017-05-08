@@ -65,6 +65,10 @@
     <Compile Include="DGVControl\DGV.Control.DGV.cs" />
     <Compile Include="DGVControl\DGV.Control.ELSR.cs" />
     <Compile Include="DGV.cs" />
+    <Compile Include="DGVControl\IDGVControl.cs" />
+    <Compile Include="DGVControl\IDGVControlInvoke.cs" />
+    <Compile Include="DGVControl\IDGVControlCreate.cs" />
+    <Compile Include="DGVControl\IDGVControlMethodsl.cs" />
     <Compile Include="ucSearch.cs">
       <SubType>UserControl</SubType>
     </Compile>
