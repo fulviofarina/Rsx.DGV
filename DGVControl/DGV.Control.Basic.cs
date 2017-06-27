@@ -137,10 +137,12 @@ namespace Rsx.DGV
       foreach (ToolStripButton i in items2) SetSaver(i);
 
       items2 = null;
-
+/*
       items2 = items.Where(i => i.Text.Contains("Add")).ToArray();
       foreach (ToolStripButton i in items2) SetAdder(i);
       items2 = null;
+      */
+
     }
 
         
@@ -207,7 +209,7 @@ namespace Rsx.DGV
       foreach (DataGridViewColumn c in dgv.Columns)
       {
         DataColumn dtcol = dt.Columns[c.DataPropertyName];
-
+        if (dtcol == null) continue;
         if (!dtcol.ReadOnly)
         {
           Font actual = c.InheritedStyle.Font;
@@ -408,6 +410,6 @@ namespace Rsx.DGV
       hs = null;
     }
 
-    public delegate void Informer(string Result, string Action, bool ok=true);
+    public delegate void Informer(string Result, string Action, bool ok=true, bool accumulate = false);
   }
 }
