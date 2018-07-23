@@ -33,7 +33,7 @@ namespace Rsx.DGV
                 base.DataGridView.NotifyCurrentCellDirty(true);
             }
             base.OnMouseDoubleClick(e);
-            base.DataGridView.ClearSelection();
+          //  base.DataGridView.ClearSelection();
         }
 
         /// <summary>
