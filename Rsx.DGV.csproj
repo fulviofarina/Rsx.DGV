@@ -60,6 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bindable.cs" />
+    <Compile Include="Calendar.cs" />
+    <Compile Include="Calculable.cs" />
     <Compile Include="DGVControl\DGV.Control.Basic.cs" />
     <Compile Include="DGVControl\DGV.Control.cs" />
     <Compile Include="DGVControl\DGV.Control.DGV.cs" />
