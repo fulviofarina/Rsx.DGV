@@ -26,14 +26,19 @@ namespace Rsx.DGV
     {
         protected override void OnMouseDoubleClick(DataGridViewCellMouseEventArgs e)
         {
-            ICalculableRow Icalc = GetICalculable();
+          //  if (this.OwningRow.Index < 0) return;
+
+            ICalculableRow Icalc = GetICalculable(e.RowIndex);
             if (Icalc != null)
             {
                 Icalc.ToDo = !Icalc.ToDo;
-                base.DataGridView.NotifyCurrentCellDirty(true);
+            
             }
-            base.OnMouseDoubleClick(e);
-          //  base.DataGridView.ClearSelection();
+           
+             base.DataGridView.NotifyCurrentCellDirty(true);
+             base.DataGridView.ClearSelection();
+              base.OnMouseDoubleClick(e);
+
         }
 
         /// <summary>
@@ -52,26 +57,39 @@ namespace Rsx.DGV
         /// <param name="paintParts">         </param>
         protected override void Paint(Graphics graphics, Rectangle clipBounds, Rectangle cellBounds, int rowIndex, DataGridViewElementStates cellState, object value, object formattedValue, string errorText, DataGridViewCellStyle cellStyle, DataGridViewAdvancedBorderStyle advancedBorderStyle, DataGridViewPaintParts paintParts)
         {
+
+            setDefaultCellStyle();
+
+            //if (this.OwningRow.Index < 0) return;
+
             //changed is not used
             //but could be used
-            ICalculableRow Icalc = GetICalculable();
+            ICalculableRow Icalc = GetICalculable(rowIndex);
 
             bool? todo = Icalc?.ToDo;
             bool? isBusy = Icalc?.IsBusy;
             Color colr = getColor(todo, isBusy);
-            bool changed = hasChanged(ref cellStyle, ref colr);
+             bool changed = hasChanged(ref cellStyle, ref colr);
+
+        
 
             base.Paint(graphics, clipBounds, cellBounds, rowIndex, cellState, value, formattedValue, errorText, cellStyle, advancedBorderStyle, paintParts);
+
+        //    base.DataGridView.NotifyCurrentCellDirty(true);
+          //  base.DataGridView.ClearSelection();
         }
 
         /// <summary>
         /// Gets the ICalculableRow Interface to the Row that this DGV cell is binded to
         /// </summary>
         /// <returns></returns>
-        public ICalculableRow GetICalculable()
+        public ICalculableRow GetICalculable(int rowIndex)
         {
             ICalculableRow Icalc = null;
-            DataRow u = ((this.OwningRow?.DataBoundItem as DataRowView)?.Row) as DataRow;
+            if (rowIndex <= -1) return Icalc;
+            DataGridViewRow r = this.DataGridView.Rows[rowIndex];
+            DataRowView v = r?.DataBoundItem as DataRowView;
+            DataRow u = (v?.Row) as DataRow;
             if (!EC.IsNuDelDetch(u))
             {
                 Icalc = u as ICalculableRow;
@@ -105,13 +123,13 @@ namespace Rsx.DGV
         /// <returns></returns>
         private static Color getColor(bool? todo, bool? isBusy)
         {
-            Color colr = Color.DarkGreen;
+            Color colr = Color.PaleGreen;
             if (todo != null && todo == true)
             {
                 if (isBusy != null)
                 {
-                    if (isBusy == true) colr = Color.DarkOrange;
-                    else colr = Color.DarkRed;
+                    if (isBusy == true) colr = Color.Orange;
+                    else colr = Color.Coral;
                 }
             }
 
@@ -125,14 +143,19 @@ namespace Rsx.DGV
         public CalculableCell() : base()
         {
 
+            setDefaultCellStyle();
+        }
+
+        private void setDefaultCellStyle()
+        {
             Color defaultColor = Color.Transparent;
             Color defaultColor2 = Color.Transparent;
 
 
-            Style.SelectionBackColor = defaultColor2;
+            Style.SelectionBackColor = defaultColor;
             Style.SelectionForeColor = defaultColor2;
 
-       
+
             Style.BackColor = defaultColor;
             Style.ForeColor = defaultColor;
         }

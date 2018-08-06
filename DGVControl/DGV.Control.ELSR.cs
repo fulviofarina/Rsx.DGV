@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Windows.Forms;
 
 namespace Rsx.DGV
@@ -148,7 +149,70 @@ namespace Rsx.DGV
       }
     }
 
-    protected void SetSaveButtonState(bool changed)
+        public static string MakeCSVFile(string path, string matrixID, ref DataGridView dgv)
+        {
+            string file = string.Empty;
+            try
+            {
+                dgv.SelectAll();
+            DataObject o = dgv.GetClipboardContent();
+
+           file= makeCSVFile(path, matrixID, ref  o);
+
+                dgv.ClearSelection();
+            }
+            catch (Exception)
+            {
+
+
+            }
+            return file;
+        }
+
+        private static string makeCSVFile(string path, string matrixID, ref DataObject o)
+        {
+            if (o == null) return string.Empty;
+            string csv = (string)o.GetData("Csv");
+
+            string file = path + matrixID + ".csv";
+            if (File.Exists(file)) File.Delete(file);
+            File.WriteAllText(file, csv);
+            return file;
+        }
+
+        public static string MakeHTMLFile(string path, string matrixID, ref DataGridView dgv, string extension)
+        {
+            string file = string.Empty;
+            try
+            {
+                dgv.SelectAll();
+                DataObject o = dgv.GetClipboardContent();
+
+                file = makeHtmlFile(path, matrixID, ref o, extension);
+
+                dgv.ClearSelection();
+            }
+            catch (Exception)
+            {
+
+               
+            }
+
+            return file;
+        }
+
+        private static string makeHtmlFile(string path, string matrixID, ref DataObject  o, string extension)
+        {
+            if (o == null) return string.Empty;
+            MemoryStream doc = (MemoryStream)o.GetData("HTML Format");
+            byte[] arr = doc.ToArray();
+            string file = path + matrixID + extension;
+            if (File.Exists(file))         File.Delete(file);
+             File.WriteAllBytes(file, arr);
+            return file;
+        }
+
+        protected void SetSaveButtonState(bool changed)
     {
       if (saveButton != null)
       {
